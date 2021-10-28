@@ -9,7 +9,7 @@ namespace FlashLauncher
     /// <summary>
     /// Class Object for a user account wich stores the username, password and email
     /// </summary>
-    internal class Account
+    public class Account
     {
         private string username = new("");
         private string password = new("");
@@ -18,7 +18,7 @@ namespace FlashLauncher
         /// <summary>
         /// Stores the username in Base64 format
         /// </summary>
-        internal string Username
+        public string Username
         {
             get {
                 byte[] bytes = Convert.FromBase64String(username);
@@ -33,7 +33,7 @@ namespace FlashLauncher
         /// <summary>
         /// Stores the password in Base64 format
         /// </summary>
-        internal string Password
+        public string Password
         {
             get
             {
@@ -50,7 +50,7 @@ namespace FlashLauncher
         /// <summary>
         /// Stores the email in Base64 format
         /// </summary>
-        internal string Email
+        public string Email
         {
             get
             {
@@ -64,7 +64,7 @@ namespace FlashLauncher
             }
         }
 
-        internal Account(string username, string password, string email)
+        public Account(string username, string password, string email)
         {
             this.Username = username;
             this.Password = password;
