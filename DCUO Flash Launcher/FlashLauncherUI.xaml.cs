@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace FlashLauncher
 {
@@ -19,9 +21,21 @@ namespace FlashLauncher
     /// </summary>
     public partial class FlashLauncherUI : Window
     {
+        /// <summary>
+        /// list of all acounts that will be shown on the ui
+        /// </summary>
+        private ObservableCollection<Account> accounts = new();
+
         public FlashLauncherUI()
         {
             InitializeComponent();
+            DataContext = accounts;
+        }
+
+        private void Button_AddAccount_Click(object sender, RoutedEventArgs e)
+        {
+            Account account = new("Tim", "p4ssw0rd", "info@tr-rbm.de");
+            Debug.WriteLine(account.Username + " " + account.Password + " " + account.Email);
         }
     }
 }
