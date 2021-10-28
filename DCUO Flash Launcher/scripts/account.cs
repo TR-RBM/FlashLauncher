@@ -11,9 +11,9 @@ namespace FlashLauncher
     /// </summary>
     internal class Account
     {
-        private string username;
-        private string password;
-        private string email;
+        private string username = new("");
+        private string password = new("");
+        private string email = new("");
 
         /// <summary>
         /// Stores the username in Base64 format
