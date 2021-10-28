@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace DCUO_Flash_Launcher
+namespace FlashLauncher
 {
     /// <summary>
     /// Interaction logic for App.xaml

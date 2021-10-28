@@ -10,17 +10,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace DCUO_Flash_Launcher
+namespace FlashLauncher
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaktionslogik für FlashLauncherUI.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class FlashLauncherUI : Window
     {
-        public MainWindow()
+        public FlashLauncherUI()
         {
             InitializeComponent();
         }
