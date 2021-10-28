@@ -44,7 +44,11 @@
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="10"/>
             </Grid.RowDefinitions>
-            <Button x:Name="Button_AddAccount" Grid.Column="1" Grid.Row="1" Content="add account" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
+            <Button x:Name="Button_AddAccount" 
+                    Grid.Column="1" Grid.Row="1" 
+                    Content="add account" 
+                    VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+                    Click="Button_AddAccount_Click"/>
         </Grid>
     </Grid>
 </Window>
