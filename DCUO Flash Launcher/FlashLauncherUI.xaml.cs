@@ -24,18 +24,18 @@ namespace FlashLauncher
         /// <summary>
         /// list of all acounts that will be shown on the ui
         /// </summary>
-        private ObservableCollection<Account> accounts = new();
+        private ObservableCollection<Account> Accounts = new();
 
         public FlashLauncherUI()
         {
             InitializeComponent();
-            DataContext = accounts;
+            DataContext = Accounts;
         }
 
         private void Button_AddAccount_Click(object sender, RoutedEventArgs e)
         {
             Account account = new("Tim", "p4ssw0rd", "info@tr-rbm.de");
-            Debug.WriteLine(account.Username + " " + account.Password + " " + account.Email);
+            Accounts.Add(account);
         }
     }
 }

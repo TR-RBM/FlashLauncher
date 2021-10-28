@@ -26,7 +26,7 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding accountName}"/>
+                                <TextBlock Text="{Binding Path=Username}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
