@@ -10,6 +10,27 @@
 
 
     <Grid x:Name="MainGrid">
+        <Grid x:Name="Grid_RightMenu">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="24*"/>
+                <RowDefinition Height="20*"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="275*"/>
+                <RowDefinition Height="55*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="25*"/>
+                <ColumnDefinition Width="50*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="21*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="Button_Play" 
+                    Grid.Row="1" Grid.Column="3"
+                    Content="Play"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    Click="Button_Play_Click"/>
+        </Grid>
         <Grid x:Name="Grid_AccountList">
             <Grid.RowDefinitions>
                 <RowDefinition Height="24*"/>
@@ -22,7 +43,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <ScrollViewer Grid.Column="1" Grid.Row="1">
-                <ListBox ItemsSource="{Binding}">
+                <ListBox x:Name="ListBox_AccountList" ItemsSource="{Binding}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
@@ -32,6 +53,38 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </ScrollViewer>
+        </Grid>
+        <Grid x:Name="Grid_Login" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="15*"/>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="15*"/>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="15*"/>
+                <ColumnDefinition Width="5*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="177*"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="10"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="1" Grid.Column="1"
+                       VerticalAlignment="Center" HorizontalAlignment="Right"
+                       Text="Username: "/>
+            <TextBox x:Name="TextBox_Username" Grid.Row="1" Grid.Column="2"
+                     VerticalAlignment="Center"
+                     TextWrapping="NoWrap"/>
+            <TextBlock Grid.Row="1" Grid.Column="4"
+                       VerticalAlignment="Center" HorizontalAlignment="Right"
+                       Text="Password: "/>
+            <PasswordBox x:Name="PasswordBox_Password" Grid.Row="1" Grid.Column="5"
+                     VerticalAlignment="Center"/>
+            <Button x:Name="Button_Login" Grid.Row="1" Grid.Column="7"
+                    Content="Login"
+                    Click="Button_Login_Click"/>
         </Grid>
         <Grid x:Name="Grid_AddAccount" Visibility="Visible">
             <Grid.ColumnDefinitions>

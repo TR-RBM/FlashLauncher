@@ -30,12 +30,62 @@ namespace FlashLauncher
         {
             InitializeComponent();
             DataContext = Accounts;
+            AccountManager am = new();
+            am.LoadFromDatabase();
+            if (am.accounts.Count > 0)
+            {
+                foreach (Account account in am.accounts)
+                {
+                    Accounts.Add(account);
+                }
+            }
         }
 
         private void Button_AddAccount_Click(object sender, RoutedEventArgs e)
         {
-            Account account = new("Tim", "p4ssw0rd", "info@tr-rbm.de");
-            Accounts.Add(account);
+            Grid_AddAccount.Visibility = Visibility.Collapsed;
+            Grid_Login.Visibility = Visibility.Visible;
+        }
+
+        private void Button_Login_Click(object sender, RoutedEventArgs e)
+        {
+            if (!String.IsNullOrEmpty(TextBox_Username.Text) || !String.IsNullOrEmpty(PasswordBox_Password.Password))
+            {
+                Account account = new(TextBox_Username.Text, PasswordBox_Password.Password);
+                WebBot bot = new();
+                bool isLoggedIn = bot.Login(account);
+                if (isLoggedIn)
+                {
+                    AccountManager am = new AccountManager();
+                    Accounts.Add(account);
+                    am.CreateNewAccount(account);
+
+                    // clear data
+                    TextBox_Username.Text = "";
+                    PasswordBox_Password.Password = "";
+                    Button_Login.Background = new SolidColorBrush(Colors.White);
+
+                    Grid_Login.Visibility = Visibility.Collapsed;
+                    Grid_AddAccount.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    Button_Login.Background = new SolidColorBrush(Colors.Red);
+                }
+            }
+        }
+
+        private void Button_Play_Click(object sender, RoutedEventArgs e)
+        {
+            if (Accounts.Count > 0)
+            {
+                if (!(ListBox_AccountList.SelectedIndex == -1))
+                {
+                    WebBot bot = new();
+                    bot.Login(Accounts[ListBox_AccountList.SelectedIndex]);
+                    bot.LaunchGame(Accounts[ListBox_AccountList.SelectedIndex]);
+                }
+            }
         }
     }
 }
