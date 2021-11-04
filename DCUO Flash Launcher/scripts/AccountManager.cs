@@ -3,31 +3,107 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.IO;
+using Microsoft.Data.Sqlite;
+using System.Diagnostics;
 
 namespace FlashLauncher
 {
     /// <summary>
     /// Class Object for managing the accounts in the local sqlite database
     /// </summary>
-    internal class AccountManager
+    public class AccountManager
     {
         /// <summary>
         /// list that stores the accounts while reading and writeing to the database
         /// </summary>
-        private List<Account> accounts = new();
+        public List<Account> accounts = new();
+        private string databasePath = new string("accounts.sqlite");
 
-        internal AccountManager()
+        public AccountManager()
         {
+            if (!File.Exists(databasePath))
+            {
+                File.Create(databasePath);
+            }
+            
+            // check if the database works and if the table exists
+            // if thats not the case, create the table
+            using (SqliteConnection connection = new("Data Source=" + databasePath))
+            {
+                connection.Open();
+                SqliteCommand command = connection.CreateCommand();
+                command.CommandText = "CREATE TABLE IF NOT EXISTS accounts(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)";
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+
         }
 
         /// <summary>
-        /// Returns a list of all accounts in the local database
+        /// Adds new account to the database
         /// </summary>
-        /// <returns>Accounts[]</returns>
-        internal Account[] GetAccountList()
+        /// <param name="account"></param>
+        public void CreateNewAccount(Account account)
         {
-            return new Account[] {};
+            accounts.Add(account);
+            SaveToDatabase();
+        }
+
+        public void SaveToDatabase()
+        {
+            try
+            {
+                using (SqliteConnection connection = new ("Data Source=" + databasePath))
+                {
+                    connection.Open();
+                    foreach (Account account in accounts)
+                    {
+                        SqliteCommand command = connection.CreateCommand();
+                        command.CommandText = "INSERT INTO accounts (username, password) VALUES (\""+ account.Username +"\",\""+ account.Password +"\");";
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// Returns a list of all accounts in the local database
+        /// can return null, if there is no database
+        /// </summary>
+        public void LoadFromDatabase()
+        {
+            if (File.Exists(databasePath))
+            {
+                try
+                {
+                    using (SqliteConnection connection = new("Data Source=" + databasePath))
+                    {
+                        connection.Open();
+                        SqliteCommand command = connection.CreateCommand();
+                        command.CommandText = "SELECT username, password FROM accounts;";
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                string username = reader.GetString(0);
+                                string password = reader.GetString(1);
+
+                                accounts.Add(new Account(username, password));
+                            }
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
         }
     }
 }
