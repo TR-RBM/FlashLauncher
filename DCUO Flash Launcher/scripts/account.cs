@@ -13,7 +13,6 @@ namespace FlashLauncher
     {
         private string username = new("");
         private string password = new("");
-        private string email = new("");
 
         /// <summary>
         /// Stores the username in Base64 format
@@ -47,28 +46,10 @@ namespace FlashLauncher
             }
         }
 
-        /// <summary>
-        /// Stores the email in Base64 format
-        /// </summary>
-        public string Email
-        {
-            get
-            {
-                byte[] bytes = Convert.FromBase64String(email);
-                return Encoding.UTF8.GetString(bytes);
-            }
-            set
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes(value);
-                email = Convert.ToBase64String(bytes);
-            }
-        }
-
-        public Account(string username, string password, string email)
+        public Account(string username, string password)
         {
             this.Username = username;
             this.Password = password;
-            this.Email = email;
         }
     }
 }
