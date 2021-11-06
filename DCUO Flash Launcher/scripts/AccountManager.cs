@@ -21,12 +21,7 @@ namespace FlashLauncher
         private string databasePath = new string("accounts.sqlite");
 
         public AccountManager()
-        {
-            if (!File.Exists(databasePath))
-            {
-                File.Create(databasePath);
-            }
-            
+        {            
             // check if the database works and if the table exists
             // if thats not the case, create the table
             using (SqliteConnection connection = new("Data Source=" + databasePath))
