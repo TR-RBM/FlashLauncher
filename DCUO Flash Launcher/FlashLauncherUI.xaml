@@ -12,18 +12,18 @@
     <Grid x:Name="MainGrid">
         <Grid x:Name="Grid_RightMenu">
             <Grid.RowDefinitions>
-                <RowDefinition Height="24*"/>
-                <RowDefinition Height="20*"/>
+                <RowDefinition Height="25"/>
                 <RowDefinition Height="20"/>
-                <RowDefinition Height="275*"/>
-                <RowDefinition Height="55*"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition/>
+                <RowDefinition Height="55"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="50*"/>
+                <ColumnDefinition/>
                 <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="21*"/>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="Button_Play" 
                     Grid.Row="1" Grid.Column="3"
@@ -33,16 +33,18 @@
         </Grid>
         <Grid x:Name="Grid_AccountList">
             <Grid.RowDefinitions>
-                <RowDefinition Height="24*"/>
-                <RowDefinition Height="305*"/>
-                <RowDefinition Height="55*"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition/>
+                <RowDefinition Height="55"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="10"/>
                 <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
-            <ScrollViewer Grid.Column="1" Grid.Row="1">
+            <ScrollViewer Grid.Column="1" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <ListBox x:Name="ListBox_AccountList" ItemsSource="{Binding}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
