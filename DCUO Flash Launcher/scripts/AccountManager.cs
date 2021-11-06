@@ -55,7 +55,7 @@ namespace FlashLauncher
                     foreach (Account account in accounts)
                     {
                         SqliteCommand command = connection.CreateCommand();
-                        command.CommandText = "INSERT INTO accounts (username, password) VALUES (\""+ account.Username +"\",\""+ account.Password +"\");";
+                        command.CommandText = "INSERT INTO accounts (username, password) VALUES (\""+ account.username +"\",\""+ account.password +"\");";
                         command.ExecuteNonQuery();
                     }
                 }
@@ -86,10 +86,17 @@ namespace FlashLauncher
                         {
                             while (reader.Read())
                             {
-                                string username = reader.GetString(0);
-                                string password = reader.GetString(1);
+                                string inputUsername = reader.GetString(0);
+                                string inputPassword = reader.GetString(1);
 
-                                accounts.Add(new Account(username, password));
+                                if (!String.IsNullOrWhiteSpace(inputUsername) && !String.IsNullOrWhiteSpace(inputPassword))
+                                {
+                                    accounts.Add(new Account()
+                                    {
+                                        username = inputUsername,
+                                        password = inputPassword
+                                    });
+                                }
                             }
                         }
                     }
