@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:FlashLauncher"
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
+        Closed="Window_Closed"
         Title="FlashLauncher" MinHeight="400" Height="400" MaxHeight="1060" MinWidth="500" MaxWidth="500">
 
 
@@ -14,6 +15,29 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
                 <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
                 <RowDefinition Height="20"/>
                 <RowDefinition/>
                 <RowDefinition Height="55"/>
@@ -25,11 +49,47 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="Button_Play" 
+            <Button x:Name="Button_Play"
                     Grid.Row="1" Grid.Column="3"
                     Content="Play"
+                    ToolTip="start the game using the selected account (ENTER)"
                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                     Click="Button_Play_Click"/>
+            <Button x:Name="Button_EditAccount"
+                    Grid.Row="3" Grid.Column="3"
+                    Content="Edit Account"
+                    ToolTip="edit selected account (E)"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    Click="Button_EditAccount_Click"/>
+            <Button x:Name="Button_MoveUp"
+                    Grid.Row="5" Grid.Column="3"
+                    Content="Move up"
+                    ToolTip="Moves the current selected account up"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    Click="Button_MoveUp_Click"/>
+            <Button x:Name="Button_MoveDown"
+                    Grid.Row="7" Grid.Column="3"
+                    Content="Move down"
+                    ToolTip="Moves the current selected account down"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    Click="Button_MoveDown_Click"/>
+            <Button x:Name="Button_CloneAbove"
+                    Grid.Row="9" Grid.Column="3"
+                    Content="Clone above"
+                    ToolTip="Clones the current selected account above the selected account"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    Click="Button_CloneAbove_Click"/>
+            <Button x:Name="Button_CloneBelow"
+                    Grid.Row="11" Grid.Column="3"
+                    Content="Clone below"
+                    ToolTip="Clones the current selected account below the selected account"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    Click="Button_CloneBelow_Click"/>
+            <Button x:Name="Button_DeleteAccount"
+                    Grid.Row="23" Grid.Column="3"
+                    Content="Delete Account"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    Click="Button_DeleteAccount_Click"/>
         </Grid>
         <Grid x:Name="Grid_AccountList">
             <Grid.RowDefinitions>
@@ -45,11 +105,11 @@
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
             <ScrollViewer Grid.Column="1" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="ListBox_AccountList" ItemsSource="{Binding}">
+                <ListBox x:Name="ListBox_AccountList" ItemsSource="{Binding}" KeyDown="ListBox_AccountList_KeyDown" MouseDoubleClick="EditAccount">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding Path=Username}"/>
+                                <TextBlock Text="{Binding Path=Username}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -99,9 +159,9 @@
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="10"/>
             </Grid.RowDefinitions>
-            <Button x:Name="Button_AddAccount" 
-                    Grid.Column="1" Grid.Row="1" 
-                    Content="add account" 
+            <Button x:Name="Button_AddAccount"
+                    Grid.Column="1" Grid.Row="1"
+                    Content="add account"
                     VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
                     Click="Button_AddAccount_Click"/>
         </Grid>

@@ -25,12 +25,12 @@ namespace FlashLauncher
         /// list of all acounts that will be shown on the ui
         /// </summary>
         private ObservableCollection<Account> Accounts = new();
+        private AccountManager am = new();
 
         public FlashLauncherUI()
         {
             InitializeComponent();
             DataContext = Accounts;
-            AccountManager am = new();
             am.LoadFromDatabase();
             if (am.accounts.Count > 0)
             {
@@ -86,6 +86,153 @@ namespace FlashLauncher
                     bot.LaunchGame(Accounts[ListBox_AccountList.SelectedIndex]);
                 }
             }
+        }
+
+        private void Button_EditAccount_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_DeleteAccount_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ListBox_AccountList_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Delete:
+                    Window delete  = new Window();
+                    am.accounts.Remove(Accounts[ListBox_AccountList.SelectedIndex]);
+                    am.SaveToDatabase();
+                    Accounts.Clear();
+                    if (am.accounts.Count > 0)
+                    {
+                        foreach (Account account in am.accounts)
+                        {
+                            Accounts.Add(account);
+                        }
+                    }
+                    break;
+                case Key.E:
+                    EditAccount();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
+        }
+
+        private void ListBox_AccountList_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (Button_Play.Visibility == Visibility.Collapsed)
+            {
+                Button_Play.Visibility = Visibility.Visible;
+                Button_EditAccount.Visibility = Visibility.Visible;
+            }
+        }
+
+        /// <summary>
+        /// Calls the EditAccount() function 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void EditAccount(object sender, MouseButtonEventArgs e)
+        {
+            EditAccount();
+        }
+
+        /// <summary>
+        /// Open a edit account window
+        /// </summary>
+        private void EditAccount()
+        {
+            if (ListBox_AccountList.SelectedIndex != -1)
+            {
+                EditAccount edit = new(
+                    Accounts[ListBox_AccountList.SelectedIndex].Username,
+                    Accounts[ListBox_AccountList.SelectedIndex].Password);
+                edit.Owner = this;
+                edit.ShowDialog();
+                am.accounts[ListBox_AccountList.SelectedIndex].Username = edit.username;
+                am.accounts[ListBox_AccountList.SelectedIndex].Password = edit.password;
+                am.SaveToDatabase();
+                Accounts.Clear();
+                if (am.accounts.Count > 0)
+                {
+                    foreach (Account account in am.accounts)
+                    {
+                        Accounts.Add(account);
+                    }
+                }
+            }
+        }
+
+        private void Button_MoveUp_Click(object sender, RoutedEventArgs e)
+        {
+            if (ListBox_AccountList.SelectedIndex - 1 > -1)
+            {
+                int newIndex = ListBox_AccountList.SelectedIndex - 1;
+                if (newIndex >= 0)
+                {
+                    Accounts.Move(ListBox_AccountList.SelectedIndex, newIndex);
+                    ListBox_AccountList.SelectedIndex = newIndex;
+                }
+                else
+                {
+                    Accounts.Move(ListBox_AccountList.SelectedIndex, Accounts.Count -1);
+                    ListBox_AccountList.SelectedIndex = Accounts.Count - 1;
+                }
+            }
+        }
+
+        private void Button_MoveDown_Click(object sender, RoutedEventArgs e)
+        {
+            if (ListBox_AccountList.SelectedIndex > 1)
+            {
+                int newIndex = ListBox_AccountList.SelectedIndex + 1;
+                if (newIndex <= Accounts.Count - 1)
+                {
+                    Accounts.Move(ListBox_AccountList.SelectedIndex, newIndex);
+                    ListBox_AccountList.SelectedIndex = newIndex;
+                }
+                else
+                {
+                    Accounts.Move(ListBox_AccountList.SelectedIndex, 0);
+                    ListBox_AccountList.SelectedIndex = 0;
+                }
+            }
+        }
+
+        private void Button_CloneAbove_Click(object sender, RoutedEventArgs e)
+        {
+            Accounts.Add(Accounts[ListBox_AccountList.SelectedIndex]);
+            Accounts.Move(ListBox_AccountList.SelectedIndex + 1, ListBox_AccountList.SelectedIndex);
+
+            am.accounts.Clear();
+            foreach (Account acc in Accounts)
+            {
+               am.accounts.Add(acc);
+            }
+            am.SaveToDatabase();
+        }
+
+        private void Button_CloneBelow_Click(object sender, RoutedEventArgs e)
+        {
+            Accounts.Add(Accounts[ListBox_AccountList.SelectedIndex]);
+
+            am.accounts.Clear();
+            foreach (Account acc in Accounts)
+            {
+                am.accounts.Add(acc);
+            }
+            am.SaveToDatabase();
         }
     }
 }
