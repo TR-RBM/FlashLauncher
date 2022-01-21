@@ -52,9 +52,13 @@ namespace FlashLauncher
                 using (SqliteConnection connection = new ("Data Source=" + databasePath))
                 {
                     connection.Open();
+                    SqliteCommand command = connection.CreateCommand();
+                    command.CommandText = "DROP TABLE accounts;";
+                    command.ExecuteNonQuery();
+                    command.CommandText = "CREATE TABLE IF NOT EXISTS accounts(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)";
+                    command.ExecuteNonQuery();
                     foreach (Account account in accounts)
                     {
-                        SqliteCommand command = connection.CreateCommand();
                         command.CommandText = "INSERT INTO accounts (username, password) VALUES (\""+ account.username +"\",\""+ account.password +"\");";
                         command.ExecuteNonQuery();
                     }
@@ -106,6 +110,15 @@ namespace FlashLauncher
                     throw;
                 }
             }
+        }
+
+        /// <summary>
+        /// Reloads the accounts list
+        /// </summary>
+        public void ReloadFromDatabase()
+        {
+            accounts.Clear();
+            LoadFromDatabase();
         }
     }
 }
