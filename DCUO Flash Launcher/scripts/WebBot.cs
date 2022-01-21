@@ -74,7 +74,7 @@ namespace FlashLauncher
         }
         public bool IsLoggedIn(Account account)
         {
-            PlaySession session = new PlaySession();
+            PlaySession? session = new PlaySession();
             if (String.IsNullOrEmpty(status))
             {
                 return false;
@@ -100,7 +100,7 @@ namespace FlashLauncher
 
         public void LaunchGame(Account account)
         {
-            PlaySession session = new PlaySession();
+            PlaySession? session = new PlaySession();
             session = JsonConvert.DeserializeObject<PlaySession>(status);
             if (!String.IsNullOrEmpty(session.launchArgs))
             {

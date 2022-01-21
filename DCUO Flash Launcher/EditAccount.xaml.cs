@@ -19,12 +19,12 @@ namespace FlashLauncher
     /// </summary>
     public partial class EditAccount : Window
     {
-        public string username = new("");
-        public string password = new("");
-        public string Username { get; set; }
-        public string Password {  get; set; }
+        public string? username = new("");
+        public string? password = new("");
+        public string? Username { get; set; }
+        public string? Password {  get; set; }
 
-        public EditAccount(string username, string password)
+        public EditAccount(string? username, string? password)
         {
             InitializeComponent();
             TextBox_Username.Text = username;
