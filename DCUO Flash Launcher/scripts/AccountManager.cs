@@ -32,7 +32,6 @@ namespace FlashLauncher
                 command.ExecuteNonQuery();
                 connection.Close();
             }
-
         }
 
         /// <summary>
