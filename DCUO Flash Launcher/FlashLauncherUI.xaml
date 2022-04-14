@@ -165,5 +165,24 @@
                     VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
                     Click="Button_AddAccount_Click"/>
         </Grid>
+        <Grid x:Name="Grid_RegionSelection">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="Region:"/>
+            <ComboBox x:Name="ComboBox_RegionSelection" Grid.Row="1" Grid.Column="2" SelectionChanged="ComboBox_RegionSelection_SelectionChanged">
+                <ComboBoxItem Content="EU"/>
+                <ComboBoxItem Content="US"/>
+            </ComboBox>
+        </Grid>
     </Grid>
 </Window>
