@@ -13,6 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using System.Threading;
+using Serilog;
+using Serilog.Configuration;
 
 namespace FlashLauncher
 {
@@ -26,11 +29,18 @@ namespace FlashLauncher
         /// </summary>
         private ObservableCollection<Account> Accounts = new();
         private AccountManager am = new();
+        private API DcuoAPI = new API();
 
+        /// <summary>
+        /// initiate the launcher
+        /// </summary>
         public FlashLauncherUI()
         {
+            Log.Logger = new LoggerConfiguration().WriteTo.File(@".\debug.log").CreateLogger();
             InitializeComponent();
             DataContext = Accounts;
+
+            // load account list
             am.LoadFromDatabase();
             if (am.accounts.Count > 0)
             {
@@ -38,6 +48,21 @@ namespace FlashLauncher
                 {
                     Accounts.Add(account);
                 }
+            }
+
+            // load region
+            RegionSettings region = new RegionSettings();
+            region.LoadSettings();
+            switch (region.CurrentSelection)
+            {
+                case "EU":
+                    ComboBox_RegionSelection.SelectedIndex = 0;
+                    break;
+                case "US":
+                    ComboBox_RegionSelection.SelectedIndex = 1;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -81,23 +106,35 @@ namespace FlashLauncher
             {
                 if (!(ListBox_AccountList.SelectedIndex == -1))
                 {
-                    WebBot bot = new();
-                    bot.Login(Accounts[ListBox_AccountList.SelectedIndex]);
-                    bot.LaunchGame(Accounts[ListBox_AccountList.SelectedIndex]);
+                    DcuoAPI.SetAccount(Accounts[ListBox_AccountList.SelectedIndex]);
+                    Debug.WriteLine("Login start");
+                    DcuoAPI.Login();
+                    Debug.WriteLine("Login done");
+                    if (!DcuoAPI.IsLoggedIn)
+                    {
+                        Debug.WriteLine("Was unable to Login");
+                    }
+                    DcuoAPI.GetLaunchArgs();
+                    DcuoAPI.LaunchGame();
+                    //bot.LaunchGame(Accounts[ListBox_AccountList.SelectedIndex]);
                 }
             }
         }
 
         private void Button_EditAccount_Click(object sender, RoutedEventArgs e)
         {
-
+            EditAccount();
         }
 
         private void Button_DeleteAccount_Click(object sender, RoutedEventArgs e)
         {
-
         }
 
+        /// <summary>
+        /// Hotkey functions
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListBox_AccountList_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -124,8 +161,14 @@ namespace FlashLauncher
             }
         }
 
+        /// <summary>
+        /// Exit and close the application
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Closed(object sender, EventArgs e)
         {
+            Log.CloseAndFlush();
             Environment.Exit(0);
         }
 
@@ -139,7 +182,7 @@ namespace FlashLauncher
         }
 
         /// <summary>
-        /// Calls the EditAccount() function 
+        /// Calls the EditAccount() function from GUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -174,6 +217,11 @@ namespace FlashLauncher
             }
         }
 
+        /// <summary>
+        /// Move selected account up
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_MoveUp_Click(object sender, RoutedEventArgs e)
         {
             if (ListBox_AccountList.SelectedIndex - 1 > -1)
@@ -192,6 +240,11 @@ namespace FlashLauncher
             }
         }
 
+        /// <summary>
+        /// Move selected account down
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_MoveDown_Click(object sender, RoutedEventArgs e)
         {
             if (ListBox_AccountList.SelectedIndex > 1)
@@ -210,6 +263,11 @@ namespace FlashLauncher
             }
         }
 
+        /// <summary>
+        /// Clone selected account above
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_CloneAbove_Click(object sender, RoutedEventArgs e)
         {
             Accounts.Add(Accounts[ListBox_AccountList.SelectedIndex]);
@@ -223,6 +281,11 @@ namespace FlashLauncher
             am.SaveToDatabase();
         }
 
+        /// <summary>
+        /// Clone selected account below
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_CloneBelow_Click(object sender, RoutedEventArgs e)
         {
             Accounts.Add(Accounts[ListBox_AccountList.SelectedIndex]);
@@ -233,6 +296,29 @@ namespace FlashLauncher
                 am.accounts.Add(acc);
             }
             am.SaveToDatabase();
+        }
+
+
+        /// <summary>
+        /// Save the new region based on selection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ComboBox_RegionSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            RegionSettings region = new RegionSettings();
+            switch (ComboBox_RegionSelection.SelectedIndex)
+            {
+                case 0:
+                    region.CurrentSelection = "EU";
+                    break;
+                case 1:
+                    region.CurrentSelection = "US";
+                    break;
+                default:
+                    break;
+            }
+            region.WriteSettings();
         }
     }
 }
