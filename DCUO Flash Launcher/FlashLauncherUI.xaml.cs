@@ -27,24 +27,40 @@ namespace FlashLauncher
         /// <summary>
         /// list of all acounts that will be shown on the ui
         /// </summary>
-        private ObservableCollection<Account> Accounts = new();
-        private AccountManager am = new();
-        private API DcuoAPI = new API();
+        public ObservableCollection<Account> Accounts { get; set; }
+
+        /// <summary>
+        /// Manager for User Accounts
+        /// </summary>
+        private AccountManager AccMgr { get; set; }
+
+        /// <summary>
+        /// DCUO API
+        /// </summary>
+        private API DcuoAPI { get; set; }
 
         /// <summary>
         /// initiate the launcher
         /// </summary>
         public FlashLauncherUI()
         {
+            // init variables
+            DcuoAPI = new API();
+            AccMgr = new AccountManager();
+            Accounts = new ObservableCollection<Account>();
+
+            // start the Logger
             Log.Logger = new LoggerConfiguration().WriteTo.File(@".\debug.log").CreateLogger();
+
+            // init GUI and set DataContext to bind to account list
             InitializeComponent();
             DataContext = Accounts;
 
             // load account list
-            am.LoadFromDatabase();
-            if (am.accounts.Count > 0)
+            AccMgr.LoadFromDatabase();
+            if (AccMgr.accounts.Count > 0)
             {
-                foreach (Account account in am.accounts)
+                foreach (Account account in AccMgr.accounts)
                 {
                     Accounts.Add(account);
                 }
@@ -72,10 +88,17 @@ namespace FlashLauncher
             Grid_Login.Visibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Process Username and Password
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Login_Click(object sender, RoutedEventArgs e)
         {
             if (!String.IsNullOrEmpty(TextBox_Username.Text) || !String.IsNullOrEmpty(PasswordBox_Password.Password))
             {
+                Progressbar_Login.Visibility = Visibility.Visible;
+                Thread.Sleep(1000);
                 Account account = new(TextBox_Username.Text, PasswordBox_Password.Password);
                 WebBot bot = new();
                 bool isLoggedIn = bot.Login(account);
@@ -96,7 +119,9 @@ namespace FlashLauncher
                 else
                 {
                     Button_Login.Background = new SolidColorBrush(Colors.Red);
+                    Progressbar_Login.Visibility = Visibility.Collapsed;
                 }
+                Progressbar_Login.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -141,12 +166,12 @@ namespace FlashLauncher
             {
                 case Key.Delete:
                     Window delete  = new Window();
-                    am.accounts.Remove(Accounts[ListBox_AccountList.SelectedIndex]);
-                    am.SaveToDatabase();
+                    AccMgr.accounts.Remove(Accounts[ListBox_AccountList.SelectedIndex]);
+                    AccMgr.SaveToDatabase();
                     Accounts.Clear();
-                    if (am.accounts.Count > 0)
+                    if (AccMgr.accounts.Count > 0)
                     {
-                        foreach (Account account in am.accounts)
+                        foreach (Account account in AccMgr.accounts)
                         {
                             Accounts.Add(account);
                         }
@@ -203,13 +228,13 @@ namespace FlashLauncher
                     Accounts[ListBox_AccountList.SelectedIndex].Password);
                 edit.Owner = this;
                 edit.ShowDialog();
-                am.accounts[ListBox_AccountList.SelectedIndex].Username = edit.username;
-                am.accounts[ListBox_AccountList.SelectedIndex].Password = edit.password;
-                am.SaveToDatabase();
+                AccMgr.accounts[ListBox_AccountList.SelectedIndex].Username = edit.username;
+                AccMgr.accounts[ListBox_AccountList.SelectedIndex].Password = edit.password;
+                AccMgr.SaveToDatabase();
                 Accounts.Clear();
-                if (am.accounts.Count > 0)
+                if (AccMgr.accounts.Count > 0)
                 {
-                    foreach (Account account in am.accounts)
+                    foreach (Account account in AccMgr.accounts)
                     {
                         Accounts.Add(account);
                     }
@@ -273,12 +298,12 @@ namespace FlashLauncher
             Accounts.Add(Accounts[ListBox_AccountList.SelectedIndex]);
             Accounts.Move(ListBox_AccountList.SelectedIndex + 1, ListBox_AccountList.SelectedIndex);
 
-            am.accounts.Clear();
+            AccMgr.accounts.Clear();
             foreach (Account acc in Accounts)
             {
-               am.accounts.Add(acc);
+               AccMgr.accounts.Add(acc);
             }
-            am.SaveToDatabase();
+            AccMgr.SaveToDatabase();
         }
 
         /// <summary>
@@ -290,12 +315,12 @@ namespace FlashLauncher
         {
             Accounts.Add(Accounts[ListBox_AccountList.SelectedIndex]);
 
-            am.accounts.Clear();
+            AccMgr.accounts.Clear();
             foreach (Account acc in Accounts)
             {
-                am.accounts.Add(acc);
+                AccMgr.accounts.Add(acc);
             }
-            am.SaveToDatabase();
+            AccMgr.SaveToDatabase();
         }
 
 

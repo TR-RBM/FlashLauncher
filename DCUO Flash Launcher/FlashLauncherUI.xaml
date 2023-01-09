@@ -51,43 +51,48 @@
             </Grid.ColumnDefinitions>
             <Button x:Name="Button_Play"
                     Grid.Row="1" Grid.Column="3"
-                    Content="Play"
+                    Content="play"
                     ToolTip="start the game using the selected account (ENTER)"
                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                     Click="Button_Play_Click"/>
             <Button x:Name="Button_EditAccount"
                     Grid.Row="3" Grid.Column="3"
-                    Content="Edit Account"
+                    Content="edit account"
                     ToolTip="edit selected account (E)"
                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                     Click="Button_EditAccount_Click"/>
             <Button x:Name="Button_MoveUp"
                     Grid.Row="5" Grid.Column="3"
-                    Content="Move up"
+                    Content="move up"
                     ToolTip="Moves the current selected account up"
                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                     Click="Button_MoveUp_Click"/>
             <Button x:Name="Button_MoveDown"
                     Grid.Row="7" Grid.Column="3"
-                    Content="Move down"
+                    Content="move down"
                     ToolTip="Moves the current selected account down"
                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                     Click="Button_MoveDown_Click"/>
             <Button x:Name="Button_CloneAbove"
                     Grid.Row="9" Grid.Column="3"
-                    Content="Clone above"
+                    Content="clone above"
                     ToolTip="Clones the current selected account above the selected account"
                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                     Click="Button_CloneAbove_Click"/>
             <Button x:Name="Button_CloneBelow"
                     Grid.Row="11" Grid.Column="3"
-                    Content="Clone below"
+                    Content="clone below"
                     ToolTip="Clones the current selected account below the selected account"
                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                     Click="Button_CloneBelow_Click"/>
+            <Button x:Name="Button_AddAccount"
+                    Grid.Row="19" Grid.Column="3"
+                    Content="add account"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    Click="Button_AddAccount_Click"/>
             <Button x:Name="Button_DeleteAccount"
-                    Grid.Row="23" Grid.Column="3"
-                    Content="Delete Account"
+                    Grid.Row="21" Grid.Column="3"
+                    Content="delete account"
                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                     Click="Button_DeleteAccount_Click"/>
         </Grid>
@@ -95,7 +100,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
                 <RowDefinition/>
-                <RowDefinition Height="55"/>
+                <RowDefinition Height="70"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -116,7 +121,7 @@
                 </ListBox>
             </ScrollViewer>
         </Grid>
-        <Grid x:Name="Grid_Login" Visibility="Collapsed">
+        <Grid x:Name="Grid_Login" Visibility="Hidden">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="5*"/>
                 <ColumnDefinition Width="15*"/>
@@ -129,9 +134,11 @@
                 <ColumnDefinition Width="5*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="177*"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="20"/>
-                <RowDefinition Height="10"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="1" Grid.Column="1"
                        VerticalAlignment="Center" HorizontalAlignment="Right"
@@ -147,6 +154,10 @@
             <Button x:Name="Button_Login" Grid.Row="1" Grid.Column="7"
                     Content="Login"
                     Click="Button_Login_Click"/>
+            <ProgressBar x:Name="Progressbar_Login" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="7"
+                         Visibility="Hidden"
+                         IsIndeterminate="True"
+                         />
         </Grid>
         <Grid x:Name="Grid_AddAccount" Visibility="Visible">
             <Grid.ColumnDefinitions>
@@ -157,13 +168,10 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="177*"/>
                 <RowDefinition Height="20"/>
-                <RowDefinition Height="10"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
             </Grid.RowDefinitions>
-            <Button x:Name="Button_AddAccount"
-                    Grid.Column="1" Grid.Row="1"
-                    Content="add account"
-                    VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
-                    Click="Button_AddAccount_Click"/>
         </Grid>
         <Grid x:Name="Grid_RegionSelection">
             <Grid.ColumnDefinitions>
