@@ -69,8 +69,9 @@ namespace FlashLauncher
         /// <summary>
         /// Use this function to try to login with the provided user account
         /// </summary>
-        public static void Login()
+        public static void Login(string region)
         {
+            Debug.WriteLine("[ API2:Login] Starte Login() mit region: " + region);
             if (UserAccount == null)
             {
                 throw new Exception("you need to provide a user account befor you can login");
@@ -79,6 +80,7 @@ namespace FlashLauncher
             Debug.WriteLine("[ API:Login ] Connecting to: " + URL.Live);
             Response = Client.GetAsync(URL.Live).Result;
             Uri uri = new Uri(URL.Live);
+            Cookies.SetCookies(uri, $"lp-version={region.ToLower()}");
             IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
             foreach (Cookie cookie in responseCookies)
             {
@@ -99,10 +101,13 @@ namespace FlashLauncher
 
             Debug.WriteLine("[ API:Login ] getting current cookies...");
             uri = new Uri(URL.Login);
-            responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
+            responseCookies = Cookies.GetCookies(uri);
+
+            int counter = 0;
             foreach (Cookie cookie in responseCookies)
             {
                 Debug.WriteLine("[ API:Login ] Cookie Login: " + cookie.Name + ": " + cookie.Value);
+                counter++;
             }
             bool _ = CheckLogin(Response.Content.ReadAsStringAsync().Result);
         }
@@ -111,6 +116,8 @@ namespace FlashLauncher
         /// Calls /get_play_session and gets the launch arguments for the game
         /// Login needs to be run first
         /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static async Task<string> GetLaunchArgs()
         {
             if (!IsLoggedIn)
@@ -124,9 +131,9 @@ namespace FlashLauncher
             get.Content = new StringContent("application/json");
             HttpResponseMessage response = await Client.SendAsync(get);
             string result = await response.Content.ReadAsStringAsync();
+
             Debug.WriteLine("[ API:GetLaunchArgs] Result: " + result);
             PS = JsonConvert.DeserializeObject<PlaySession>(result);
-
 
             Uri uri = new Uri(URL.GetPlaySession);
             IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
@@ -164,6 +171,7 @@ namespace FlashLauncher
         /// Launches the Game with provided arguments
         /// </summary>
         /// <param name="_LaunchArgs"></param>
+        /// <param name="region"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public static void LaunchGame(string _LaunchArgs)
         {
