@@ -16,6 +16,10 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using Serilog;
 using Serilog.Configuration;
+using System.Net.Http;
+using System.Net;
+using System.Security.Policy;
+using Windows.Media.Protection.PlayReady;
 
 namespace FlashLauncher
 {
@@ -35,17 +39,20 @@ namespace FlashLauncher
         private AccountManager AccMgr { get; set; }
 
         /// <summary>
-        /// DCUO API
-        /// </summary>
-        private API DcuoAPI { get; set; }
-
-        /// <summary>
         /// initiate the launcher
         /// </summary>
         public FlashLauncherUI()
         {
             // init variables
-            DcuoAPI = new API();
+            API2.Cookies = new CookieContainer();
+            API2.Handler = new HttpClientHandler();
+            API2.Handler.CookieContainer = API2.Cookies;
+            API2.Client = new HttpClient(API2.Handler, false);
+            API2.Urls = new DcuoUrls();
+            API2.IsLoggedIn = false;
+            API2.LaunchArgs = "";
+            API2.dcuoLaunchmefirstPath = new(@"C:\Users\Public\Daybreak Game Company\Installed Games\DC Universe Online\UNREAL3\BINARIES\WIN32\LAUNCHMEFIRST.EXE");
+
             AccMgr = new AccountManager();
             Accounts = new ObservableCollection<Account>();
 
@@ -125,22 +132,26 @@ namespace FlashLauncher
             }
         }
 
-        private void Button_Play_Click(object sender, RoutedEventArgs e)
+        private async void Button_Play_Click(object sender, RoutedEventArgs e)
         {
             if (Accounts.Count > 0)
             {
                 if (!(ListBox_AccountList.SelectedIndex == -1))
                 {
-                    DcuoAPI.SetAccount(Accounts[ListBox_AccountList.SelectedIndex]);
-                    Debug.WriteLine("Login start");
-                    DcuoAPI.Login();
-                    Debug.WriteLine("Login done");
-                    if (!DcuoAPI.IsLoggedIn)
+                    // set the user account based on the current selected account
+                    API2.SetAccount(Accounts[ListBox_AccountList.SelectedIndex]);
+                    Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login start");
+
+                    
+                    API2.Login();
+
+                    Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login done");
+                    if (!API2.IsLoggedIn)
                     {
-                        Debug.WriteLine("Was unable to Login");
+                        Debug.WriteLine("[FlashLauncher:Button_Play_Click] Was unable to Login");
                     }
-                    DcuoAPI.GetLaunchArgs();
-                    DcuoAPI.LaunchGame();
+                    string launchArgs = await API2.GetLaunchArgs();
+                    API2.LaunchGame(launchArgs);
                     //bot.LaunchGame(Accounts[ListBox_AccountList.SelectedIndex]);
                 }
             }
