@@ -45,7 +45,17 @@ namespace FlashLauncher
         /// launch arguments for the game
         /// </summary>
         internal static string LaunchArgs { get; set; }
+
+        /// <summary>
+        /// Path to launchmefirst executable
+        /// </summary>
         internal static string dcuoLaunchmefirstPath { get; set; }
+
+        /// <summary>
+        /// Storage container for the current playsession
+        /// </summary>
+        internal static PlaySession PS { get; set; }
+
 
         /// <summary>
         /// Set username and passwort that is used for API access
@@ -84,7 +94,6 @@ namespace FlashLauncher
             Debug.WriteLine("[ API:Login ] posting data to: " + URL.Login);
             HttpResponseMessage httpResponseMessage = Client.PostAsync(URL.Login, content).Result;
             Response = httpResponseMessage;
-            //result.EnsureSuccessStatusCode();
             string _data = Response.Content.ReadAsStringAsync().Result;
             Debug.WriteLine("[ API:Login ] post result: " + _data);
 
@@ -116,13 +125,15 @@ namespace FlashLauncher
             HttpResponseMessage response = await Client.SendAsync(get);
             string result = await response.Content.ReadAsStringAsync();
             Debug.WriteLine("[ API:GetLaunchArgs] Result: " + result);
+            PS = JsonConvert.DeserializeObject<PlaySession>(result);
+
 
             Uri uri = new Uri(URL.GetPlaySession);
             IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
             foreach (Cookie cookie in responseCookies)
                 Debug.WriteLine("[ API:GetLaunchArgs ] Cookie: " + cookie.Name + ": " + cookie.Value);
-            Debug.WriteLine("[ API:GetLaunchArgs ] LaunchArgs: " + Response.Content.ReadAsStringAsync().Result);
-            return Response.Content.ReadAsStringAsync().Result;
+            Debug.WriteLine("[ API:GetLaunchArgs ] LaunchArgs: " + PS.LaunchArgs);
+            return PS.LaunchArgs;
         }
 
         /// <summary>
@@ -164,7 +175,7 @@ namespace FlashLauncher
                     StartInfo = new()
                     {
                         FileName = dcuoLaunchmefirstPath,
-                        Arguments = LaunchArgs,
+                        Arguments = _LaunchArgs,
                         UseShellExecute = false,
                         CreateNoWindow = false
                     }
