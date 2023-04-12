@@ -8,6 +8,8 @@ using System.Net.Http.Headers;
 using System.Net;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using static System.Net.WebRequestMethods;
+using System.Collections;
 
 namespace FlashLauncher
 {
@@ -45,6 +47,11 @@ namespace FlashLauncher
         private string LaunchArgs { get; set; }
         public string dcuoLaunchmefirstPath { get; set; }
 
+       /// <summary>
+       /// list of all DCUO Urls
+       /// </summary>
+        public DcuoUrls Urls { get; set; }
+
         /// <summary>
         /// API für interacting with the DCUO / Daybreak / Census API
         /// </summary>
@@ -53,7 +60,8 @@ namespace FlashLauncher
             Cookies = new CookieContainer();
             Handler = new HttpClientHandler();
             Handler.CookieContainer = Cookies;
-            Client = new HttpClient(Handler);
+            Client = new HttpClient(Handler, false);
+            Urls = new DcuoUrls();
             IsLoggedIn = false;
             LaunchArgs = "";
             dcuoLaunchmefirstPath = new(@"C:\Users\Public\Daybreak Game Company\Installed Games\DC Universe Online\UNREAL3\BINARIES\WIN32\LAUNCHMEFIRST.EXE");
@@ -71,7 +79,7 @@ namespace FlashLauncher
         /// <summary>
         /// Use this function to try to login with the provided user account
         /// </summary>
-        public async void Login()
+        public void Login()
         {
             if (UserAccount == null)
             {
@@ -83,29 +91,34 @@ namespace FlashLauncher
                 using (Client)
                 {
                     // get session Cookie
+                    Debug.WriteLine("[ API:Login ] Connecting to: https://lpj.daybreakgames.com/dcuo/live/");
                     Response = Client.GetAsync("https://lpj.daybreakgames.com/dcuo/live/").Result;
                     Uri uri = new Uri("https://lpj.daybreakgames.com/dcuo/live/");
                     IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
                     foreach (Cookie cookie in responseCookies)
                     {
-                        Debug.WriteLine("Cookie Session: " + cookie.Name + ": " + cookie.Value);
+                        Debug.WriteLine("[ API:Login ] set cookie: " + cookie.Name + ": " + cookie.Value);
                     }
 
+                    Debug.WriteLine("[ API:Login ] adding Username " + UserAccount.Username + " and password to cookie");
                     FormUrlEncodedContent content = new(new[]
                     {
                         new KeyValuePair<string, string>("username", UserAccount.Username),
                         new KeyValuePair<string, string>("password", UserAccount.Password),
                     });
-
-                    HttpResponseMessage result = await Client.PostAsync("https://lpj.daybreakgames.com/dcuo/live/login", content);
+                    Debug.WriteLine("[ API:Login ] posting data to: https://lpj.daybreakgames.com/dcuo/live/login");
+                    HttpResponseMessage httpResponseMessage = Client.PostAsync("https://lpj.daybreakgames.com/dcuo/live/login", content).Result;
+                    Response = httpResponseMessage;
                     //result.EnsureSuccessStatusCode();
-                    Debug.WriteLine(await result.Content.ReadAsStringAsync());
+                    string _data = Response.Content.ReadAsStringAsync().Result;
+                    Debug.WriteLine("[ API:Login ] post result: " + _data);
 
+                    Debug.WriteLine("[ API:Login ] getting current cookies...");
                     uri = new Uri("https://lpj.daybreakgames.com/dcuo/live/login");
                     responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
                     foreach (Cookie cookie in responseCookies)
                     {
-                        Debug.WriteLine("Cookie Login: " + cookie.Name + ": " + cookie.Value);
+                        Debug.WriteLine("[ API:Login ] Cookie Login: " + cookie.Name + ": " + cookie.Value);
                     }
                     bool _ = CheckLogin(Response.Content.ReadAsStringAsync().Result);
                 }
@@ -116,7 +129,7 @@ namespace FlashLauncher
         /// Calls /get_play_session and gets the launch arguments for the game
         /// Login needs to be run first
         /// </summary>
-        public void GetLaunchArgs()
+        public async Task<string> GetLaunchArgs()
         {
             if (!IsLoggedIn)
             {
@@ -124,15 +137,28 @@ namespace FlashLauncher
             }
             using (Handler)
             {
-                using (Client)
+                using (var Client2 = new HttpClient(Handler, false))
                 {
-                    Response = Client.GetAsync("https://lpj.daybreakgames.com/dcuo/live/get_play_session").Result;
-                    Uri uri = new Uri("https://lpj.daybreakgames.com/dcuo/live/get_play_session");
+                    Debug.WriteLine("[ API:GetLaunchArgs] getting launch arguments...");
+                    Debug.WriteLine("[ API:GetLaunchArgs] connecting to: https://lpj.daybreakgames.com/dcuo/live/get_play_session");
+                    
+                    //Response = Client.GetAsync("https://lpj.daybreakgames.com/dcuo/live/get_play_session").Result;
+
+                    string URL = "https://lpj.daybreakgames.com/dcuo/live/get_play_session";
+                    using (HttpRequestMessage get = new HttpRequestMessage(HttpMethod.Get, URL))
+                    {
+                        get.Content = new StringContent("application/json");
+                        HttpResponseMessage response = await Client2.SendAsync(get);
+                        string result = await response.Content.ReadAsStringAsync();
+                        Debug.WriteLine("[ API:GetLaunchArgs] Result: " + result);
+                    }
+
+                    Uri uri = new Uri(URL);
                     IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
                     foreach (Cookie cookie in responseCookies)
-                        Debug.WriteLine("get_play_session Cookie: " + cookie.Name + ": " + cookie.Value);
-                    Debug.WriteLine("get_play_session: " + Response.Content.ReadAsStringAsync().Result);
-                    LaunchArgs = Response.Content.ReadAsStringAsync().Result;
+                        Debug.WriteLine("[ API:GetLaunchArgs ] Cookie: " + cookie.Name + ": " + cookie.Value);
+                    Debug.WriteLine("[ API:GetLaunchArgs ] LaunchArgs: " + Response.Content.ReadAsStringAsync().Result);
+                    return Response.Content.ReadAsStringAsync().Result;
                 }
             }
         }
@@ -144,10 +170,10 @@ namespace FlashLauncher
         /// <returns><see langword="true"/> or <see langword="false"/></returns>
         private bool CheckLogin(string jsession)
         {
-            Debug.WriteLine("func(): CheckLogin: " + jsession);
+            Debug.WriteLine("[ CheckLogin ] Jsession: " + jsession);
             PlaySession? session = new PlaySession();
             session = JsonConvert.DeserializeObject<PlaySession>(jsession);
-            Debug.WriteLine("func(): CheckLogin: " + session.username + " " + session.category);
+            Debug.WriteLine("[ CheckLogin ] Username and Category: " + session.username + " " + session.category);
             if (session.username == UserAccount.Username && session.category == "SUCCESS")
             {
                 IsLoggedIn = true;
@@ -160,9 +186,10 @@ namespace FlashLauncher
             }
         }
 
-        public void LaunchGame()
+        public void LaunchGame(string _LaunchArgs)
         {
-            if (!String.IsNullOrEmpty(LaunchArgs))
+            string _argName = "_LaunchArgs";
+            if (!String.IsNullOrEmpty(_LaunchArgs))
             {
                 Process dcuo = new()
                 {
@@ -174,7 +201,13 @@ namespace FlashLauncher
                         CreateNoWindow = false
                     }
                 };
+                Debug.WriteLine("[ Launch ] launching game!");
                 dcuo.Start();
+            }
+            else
+            {
+                Debug.WriteLine("[ Launch ] _LaunchArgs : " + _argName);
+                throw new ArgumentNullException(_argName);
             }
         }
     }
