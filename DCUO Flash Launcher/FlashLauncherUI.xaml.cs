@@ -48,7 +48,6 @@ namespace FlashLauncher
             API2.Handler = new HttpClientHandler();
             API2.Handler.CookieContainer = API2.Cookies;
             API2.Client = new HttpClient(API2.Handler, false);
-            API2.Urls = new DcuoUrls();
             API2.IsLoggedIn = false;
             API2.LaunchArgs = "";
             API2.dcuoLaunchmefirstPath = new(@"C:\Users\Public\Daybreak Game Company\Installed Games\DC Universe Online\UNREAL3\BINARIES\WIN32\LAUNCHMEFIRST.EXE");
@@ -105,7 +104,6 @@ namespace FlashLauncher
             if (!String.IsNullOrEmpty(TextBox_Username.Text) || !String.IsNullOrEmpty(PasswordBox_Password.Password))
             {
                 Progressbar_Login.Visibility = Visibility.Visible;
-                Thread.Sleep(1000);
                 Account account = new(TextBox_Username.Text, PasswordBox_Password.Password);
                 WebBot bot = new();
                 bool isLoggedIn = bot.Login(account);
@@ -142,7 +140,6 @@ namespace FlashLauncher
                     API2.SetAccount(Accounts[ListBox_AccountList.SelectedIndex]);
                     Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login start");
 
-                    
                     API2.Login();
 
                     Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login done");
