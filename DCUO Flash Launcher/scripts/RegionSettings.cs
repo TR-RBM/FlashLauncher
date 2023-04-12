@@ -10,8 +10,8 @@ namespace FlashLauncher
     /// </summary>
     public class RegionSettings
     {
-        public string CurrentSelection = "EU";
-        private string[] AllowedRegions = new string[] { "EU", "US" };
+        public string CurrentSelection = "eu";
+        private string[] AllowedRegions = new string[] { "eu", "us" };
         private string SettingsFilePath = @".\settings.ini";
         private string DefaultRegionStr = "defaultRegion";
         public RegionSettings()

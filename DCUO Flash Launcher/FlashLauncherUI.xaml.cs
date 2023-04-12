@@ -39,10 +39,18 @@ namespace FlashLauncher
         private AccountManager AccMgr { get; set; }
 
         /// <summary>
+        /// Region selection for Server choice
+        /// </summary>
+        private RegionSettings Region { get; set; }
+
+        /// <summary>
         /// initiate the launcher
         /// </summary>
         public FlashLauncherUI()
         {
+            Debug.WriteLine("[ FlashLauncherUI:Init ] Program started");
+
+            Debug.Write("[ FlashLauncherUI:Init ] Init Variables... ");
             // init variables
             API2.Cookies = new CookieContainer();
             API2.Handler = new HttpClientHandler();
@@ -51,17 +59,21 @@ namespace FlashLauncher
             API2.IsLoggedIn = false;
             API2.LaunchArgs = "";
             API2.dcuoLaunchmefirstPath = new(@"C:\Users\Public\Daybreak Game Company\Installed Games\DC Universe Online\UNREAL3\BINARIES\WIN32\LAUNCHMEFIRST.EXE");
-
+ 
             AccMgr = new AccountManager();
             Accounts = new ObservableCollection<Account>();
 
             // start the Logger
             Log.Logger = new LoggerConfiguration().WriteTo.File(@".\debug.log").CreateLogger();
 
+            Debug.WriteLine("done");
+
+
             // init GUI and set DataContext to bind to account list
+
             InitializeComponent();
             DataContext = Accounts;
-
+            
             // load account list
             AccMgr.LoadFromDatabase();
             if (AccMgr.accounts.Count > 0)
@@ -73,14 +85,16 @@ namespace FlashLauncher
             }
 
             // load region
-            RegionSettings region = new RegionSettings();
-            region.LoadSettings();
-            switch (region.CurrentSelection)
+            Region = new RegionSettings();
+            Region.LoadSettings();
+            Debug.WriteLine("[ FlashLauncherUI:Init ] Loaded Region: " + Region.CurrentSelection);
+
+            switch (Region.CurrentSelection)
             {
-                case "EU":
+                case "eu":
                     ComboBox_RegionSelection.SelectedIndex = 0;
                     break;
-                case "US":
+                case "us":
                     ComboBox_RegionSelection.SelectedIndex = 1;
                     break;
                 default:
@@ -140,7 +154,7 @@ namespace FlashLauncher
                     API2.SetAccount(Accounts[ListBox_AccountList.SelectedIndex]);
                     Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login start");
 
-                    API2.Login();
+                    API2.Login(Region.CurrentSelection);
 
                     Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login done");
                     if (!API2.IsLoggedIn)
@@ -339,19 +353,18 @@ namespace FlashLauncher
         /// <param name="e"></param>
         private void ComboBox_RegionSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            RegionSettings region = new RegionSettings();
             switch (ComboBox_RegionSelection.SelectedIndex)
             {
                 case 0:
-                    region.CurrentSelection = "EU";
+                    Region.CurrentSelection = "EU";
                     break;
                 case 1:
-                    region.CurrentSelection = "US";
+                    Region.CurrentSelection = "US";
                     break;
                 default:
                     break;
             }
-            region.WriteSettings();
+            Region.WriteSettings();
         }
     }
 }
