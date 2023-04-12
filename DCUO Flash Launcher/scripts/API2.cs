@@ -70,44 +70,37 @@ namespace FlashLauncher
             {
                 throw new Exception("you need to provide a user account befor you can login");
             }
-
-            using (Handler)
+            // get session Cookie
+            Debug.WriteLine("[ API:Login ] Connecting to: https://lpj.daybreakgames.com/dcuo/live/");
+            Response = Client.GetAsync("https://lpj.daybreakgames.com/dcuo/live/").Result;
+            Uri uri = new Uri("https://lpj.daybreakgames.com/dcuo/live/");
+            IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
+            foreach (Cookie cookie in responseCookies)
             {
-                using (Client)
-                {
-                    // get session Cookie
-                    Debug.WriteLine("[ API:Login ] Connecting to: https://lpj.daybreakgames.com/dcuo/live/");
-                    Response = Client.GetAsync("https://lpj.daybreakgames.com/dcuo/live/").Result;
-                    Uri uri = new Uri("https://lpj.daybreakgames.com/dcuo/live/");
-                    IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
-                    foreach (Cookie cookie in responseCookies)
-                    {
-                        Debug.WriteLine("[ API:Login ] set cookie: " + cookie.Name + ": " + cookie.Value);
-                    }
-
-                    Debug.WriteLine("[ API:Login ] adding Username " + UserAccount.Username + " and password to cookie");
-                    FormUrlEncodedContent content = new(new[]
-                    {
-                        new KeyValuePair<string, string>("username", UserAccount.Username),
-                        new KeyValuePair<string, string>("password", UserAccount.Password),
-                    });
-                    Debug.WriteLine("[ API:Login ] posting data to: https://lpj.daybreakgames.com/dcuo/live/login");
-                    HttpResponseMessage httpResponseMessage = Client.PostAsync("https://lpj.daybreakgames.com/dcuo/live/login", content).Result;
-                    Response = httpResponseMessage;
-                    //result.EnsureSuccessStatusCode();
-                    string _data = Response.Content.ReadAsStringAsync().Result;
-                    Debug.WriteLine("[ API:Login ] post result: " + _data);
-
-                    Debug.WriteLine("[ API:Login ] getting current cookies...");
-                    uri = new Uri("https://lpj.daybreakgames.com/dcuo/live/login");
-                    responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
-                    foreach (Cookie cookie in responseCookies)
-                    {
-                        Debug.WriteLine("[ API:Login ] Cookie Login: " + cookie.Name + ": " + cookie.Value);
-                    }
-                    bool _ = CheckLogin(Response.Content.ReadAsStringAsync().Result);
-                }
+                Debug.WriteLine("[ API:Login ] set cookie: " + cookie.Name + ": " + cookie.Value);
             }
+
+            Debug.WriteLine("[ API:Login ] adding Username " + UserAccount.Username + " and password to cookie");
+            FormUrlEncodedContent content = new(new[]
+            {
+                new KeyValuePair<string, string>("username", UserAccount.Username),
+                new KeyValuePair<string, string>("password", UserAccount.Password),
+            });
+            Debug.WriteLine("[ API:Login ] posting data to: https://lpj.daybreakgames.com/dcuo/live/login");
+            HttpResponseMessage httpResponseMessage = Client.PostAsync("https://lpj.daybreakgames.com/dcuo/live/login", content).Result;
+            Response = httpResponseMessage;
+            //result.EnsureSuccessStatusCode();
+            string _data = Response.Content.ReadAsStringAsync().Result;
+            Debug.WriteLine("[ API:Login ] post result: " + _data);
+
+            Debug.WriteLine("[ API:Login ] getting current cookies...");
+            uri = new Uri("https://lpj.daybreakgames.com/dcuo/live/login");
+            responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
+            foreach (Cookie cookie in responseCookies)
+            {
+                Debug.WriteLine("[ API:Login ] Cookie Login: " + cookie.Name + ": " + cookie.Value);
+            }
+            bool _ = CheckLogin(Response.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -120,32 +113,25 @@ namespace FlashLauncher
             {
                 throw new Exception("you need to be logged in to use the function");
             }
-            using (Handler)
-            {
-                using (var Client2 = new HttpClient(Handler, false))
-                {
-                    Debug.WriteLine("[ API:GetLaunchArgs] getting launch arguments...");
-                    Debug.WriteLine("[ API:GetLaunchArgs] connecting to: https://lpj.daybreakgames.com/dcuo/live/get_play_session");
+            Debug.WriteLine("[ API:GetLaunchArgs] getting launch arguments...");
+            Debug.WriteLine("[ API:GetLaunchArgs] connecting to: https://lpj.daybreakgames.com/dcuo/live/get_play_session");
 
-                    //Response = Client.GetAsync("https://lpj.daybreakgames.com/dcuo/live/get_play_session").Result;
+            //Response = Client.GetAsync("https://lpj.daybreakgames.com/dcuo/live/get_play_session").Result;
 
-                    string URL = "https://lpj.daybreakgames.com/dcuo/live/get_play_session";
-                    using (HttpRequestMessage get = new HttpRequestMessage(HttpMethod.Get, URL))
-                    {
-                        get.Content = new StringContent("application/json");
-                        HttpResponseMessage response = await Client2.SendAsync(get);
-                        string result = await response.Content.ReadAsStringAsync();
-                        Debug.WriteLine("[ API:GetLaunchArgs] Result: " + result);
-                    }
+            string URL = "https://lpj.daybreakgames.com/dcuo/live/get_play_session";
 
-                    Uri uri = new Uri(URL);
-                    IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
-                    foreach (Cookie cookie in responseCookies)
-                        Debug.WriteLine("[ API:GetLaunchArgs ] Cookie: " + cookie.Name + ": " + cookie.Value);
-                    Debug.WriteLine("[ API:GetLaunchArgs ] LaunchArgs: " + Response.Content.ReadAsStringAsync().Result);
-                    return Response.Content.ReadAsStringAsync().Result;
-                }
-            }
+            HttpRequestMessage get = new HttpRequestMessage(HttpMethod.Get, URL);
+            get.Content = new StringContent("application/json");
+            HttpResponseMessage response = await Client.SendAsync(get);
+            string result = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine("[ API:GetLaunchArgs] Result: " + result);
+
+            Uri uri = new Uri(URL);
+            IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
+            foreach (Cookie cookie in responseCookies)
+                Debug.WriteLine("[ API:GetLaunchArgs ] Cookie: " + cookie.Name + ": " + cookie.Value);
+            Debug.WriteLine("[ API:GetLaunchArgs ] LaunchArgs: " + Response.Content.ReadAsStringAsync().Result);
+            return Response.Content.ReadAsStringAsync().Result;
         }
 
         /// <summary>
