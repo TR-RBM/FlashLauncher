@@ -20,6 +20,7 @@ using System.Net.Http;
 using System.Net;
 using System.Security.Policy;
 using Windows.Media.Protection.PlayReady;
+using System.Runtime.CompilerServices;
 
 namespace FlashLauncher
 {
@@ -113,15 +114,24 @@ namespace FlashLauncher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Button_Login_Click(object sender, RoutedEventArgs e)
+        private async void Button_Login_Click(object sender, RoutedEventArgs e)
         {
+            Progressbar_Login.IsIndeterminate = true;
             if (!String.IsNullOrEmpty(TextBox_Username.Text) || !String.IsNullOrEmpty(PasswordBox_Password.Password))
             {
-                Progressbar_Login.Visibility = Visibility.Visible;
-                Account account = new(TextBox_Username.Text, PasswordBox_Password.Password);
-                WebBot bot = new();
-                bool isLoggedIn = bot.Login(account);
-                if (isLoggedIn)
+                Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login start");
+
+                Account account = new Account(username:TextBox_Username.Text,password:PasswordBox_Password.Password);
+                API2.SetAccount(account);
+                await API2.Login(Region.CurrentSelection);
+
+                Debug.WriteLine("[FlashLauncher:Button_Login_Click] Login done");
+                if (!API2.IsLoggedIn)
+                {
+                    Debug.WriteLine("[FlashLauncher:Button_Play_Click] Was unable to Login");
+                }
+
+                if (API2.IsLoggedIn)
                 {
                     AccountManager am = new AccountManager();
                     Accounts.Add(account);
@@ -129,23 +139,19 @@ namespace FlashLauncher
 
                     // clear data
                     TextBox_Username.Text = "";
-                    PasswordBox_Password.Password = "";
-                    Button_Login.Background = new SolidColorBrush(Colors.White);
-
-                    Grid_Login.Visibility = Visibility.Collapsed;
-                    Grid_AddAccount.Visibility = Visibility.Visible;
+                    PasswordBox_Password.Password = ""; 
                 }
                 else
                 {
-                    Button_Login.Background = new SolidColorBrush(Colors.Red);
-                    Progressbar_Login.Visibility = Visibility.Collapsed;
+
                 }
-                Progressbar_Login.Visibility = Visibility.Collapsed;
             }
+            Progressbar_Login.IsIndeterminate = false;
         }
 
         private async void Button_Play_Click(object sender, RoutedEventArgs e)
         {
+            Progressbar_Login.IsIndeterminate = true;
             if (Accounts.Count > 0)
             {
                 if (!(ListBox_AccountList.SelectedIndex == -1))
@@ -154,7 +160,7 @@ namespace FlashLauncher
                     API2.SetAccount(Accounts[ListBox_AccountList.SelectedIndex]);
                     Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login start");
 
-                    API2.Login(Region.CurrentSelection);
+                    await API2.Login(Region.CurrentSelection);
 
                     Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login done");
                     if (!API2.IsLoggedIn)
@@ -163,9 +169,9 @@ namespace FlashLauncher
                     }
                     string launchArgs = await API2.GetLaunchArgs();
                     API2.LaunchGame(launchArgs);
-                    //bot.LaunchGame(Accounts[ListBox_AccountList.SelectedIndex]);
                 }
             }
+            Progressbar_Login.IsIndeterminate = false;
         }
 
         private void Button_EditAccount_Click(object sender, RoutedEventArgs e)
@@ -175,6 +181,20 @@ namespace FlashLauncher
 
         private void Button_DeleteAccount_Click(object sender, RoutedEventArgs e)
         {
+            if (ListBox_AccountList.SelectedIndex < 0)
+            {
+                return;
+            }
+            AccMgr.accounts.Remove(Accounts[ListBox_AccountList.SelectedIndex]);
+            AccMgr.SaveToDatabase();
+            Accounts.Clear();
+            if (AccMgr.accounts.Count > 0)
+            {
+                foreach (Account account in AccMgr.accounts)
+                {
+                    Accounts.Add(account);
+                }
+            }
         }
 
         /// <summary>
@@ -187,7 +207,6 @@ namespace FlashLauncher
             switch (e.Key)
             {
                 case Key.Delete:
-                    Window delete  = new Window();
                     AccMgr.accounts.Remove(Accounts[ListBox_AccountList.SelectedIndex]);
                     AccMgr.SaveToDatabase();
                     Accounts.Clear();
@@ -243,13 +262,15 @@ namespace FlashLauncher
         /// </summary>
         private void EditAccount()
         {
-            if (ListBox_AccountList.SelectedIndex != -1)
+            Debug.WriteLine("[EditAccount] Seleted ID: " + ListBox_AccountList.SelectedIndex.ToString());
+            if (ListBox_AccountList.SelectedIndex is not > 0)
             {
                 EditAccount edit = new(
                     Accounts[ListBox_AccountList.SelectedIndex].Username,
                     Accounts[ListBox_AccountList.SelectedIndex].Password);
                 edit.Owner = this;
                 edit.ShowDialog();
+
                 AccMgr.accounts[ListBox_AccountList.SelectedIndex].Username = edit.username;
                 AccMgr.accounts[ListBox_AccountList.SelectedIndex].Password = edit.password;
                 AccMgr.SaveToDatabase();
@@ -353,13 +374,21 @@ namespace FlashLauncher
         /// <param name="e"></param>
         private void ComboBox_RegionSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            BitmapImage ServerRegionImage = new BitmapImage();
+            ServerRegionImage.BeginInit();
             switch (ComboBox_RegionSelection.SelectedIndex)
             {
                 case 0:
                     Region.CurrentSelection = "EU";
+                    ServerRegionImage.UriSource = new Uri("pack://application:,,,/FlashLauncher;component/assets/europaische-union.png");
+                    ServerRegionImage.EndInit();
+                    Image_ServerRegion.Source = ServerRegionImage;
                     break;
                 case 1:
                     Region.CurrentSelection = "US";
+                    ServerRegionImage.UriSource = new Uri("pack://application:,,,/FlashLauncher;component/assets/vereinigte-staaten.png");
+                    ServerRegionImage.EndInit();
+                    Image_ServerRegion.Source = ServerRegionImage;
                     break;
                 default:
                     break;

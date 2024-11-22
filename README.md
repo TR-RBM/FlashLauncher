@@ -9,7 +9,7 @@
 - the default servers are US
 
 # Requirements
-- [.NET Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/5.0)
+- [.NET Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) Version 8.0
 - A decent version of [Firefox](https://www.mozilla.org/) is required for the login process
 - the game needs to be installed and updated with the official launcher from DCUO (i havent tested the steam version yet)
 - the game needs to be installed in the default location

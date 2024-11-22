@@ -69,39 +69,44 @@ namespace FlashLauncher
         /// <summary>
         /// Use this function to try to login with the provided user account
         /// </summary>
-        public static void Login(string region)
+        public static async Task Login(string region)
         {
             Debug.WriteLine("[ API2:Login] Starte Login() mit region: " + region);
             if (UserAccount == null)
             {
                 throw new Exception("you need to provide a user account befor you can login");
             }
-            // get session Cookie
+
+            // Session-Cookie abrufen
             Debug.WriteLine("[ API:Login ] Connecting to: " + URL.Live);
-            Response = Client.GetAsync(URL.Live).Result;
+            HttpResponseMessage response = await Client.GetAsync(URL.Live); // Warten auf die Antwort
             Uri uri = new Uri(URL.Live);
             Cookies.SetCookies(uri, $"lp-version={region.ToLower()}");
+
             IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
             foreach (Cookie cookie in responseCookies)
             {
-                Debug.WriteLine("[ API:Login ] set cookie: " + cookie.Name + ": " + cookie.Value);
+                Debug.WriteLine("[ API:Login ] Set cookie: " + cookie.Name + ": " + cookie.Value);
             }
 
-            Debug.WriteLine("[ API:Login ] adding Username " + UserAccount.Username + " and password to cookie");
-            FormUrlEncodedContent content = new(new[]
+            // Login-Daten hinzufügen
+            Debug.WriteLine("[ API:Login ] Adding Username " + UserAccount.Username + " and password to cookie");
+            var content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("username", UserAccount.Username),
                 new KeyValuePair<string, string>("password", UserAccount.Password),
             });
-            Debug.WriteLine("[ API:Login ] posting data to: " + URL.Login);
-            HttpResponseMessage httpResponseMessage = Client.PostAsync(URL.Login, content).Result;
-            Response = httpResponseMessage;
-            string _data = Response.Content.ReadAsStringAsync().Result;
-            Debug.WriteLine("[ API:Login ] post result: " + _data);
 
-            Debug.WriteLine("[ API:Login ] getting current cookies...");
+            Debug.WriteLine("[ API:Login ] Posting data to: " + URL.Login);
+            response = await Client.PostAsync(URL.Login, content); // Asynchroner Post-Aufruf
+            string responseData = await response.Content.ReadAsStringAsync(); // Asynchron Daten lesen
+
+            Debug.WriteLine("[ API:Login ] Post result: " + responseData);
+
+            // Cookies erneut abrufen
+            Debug.WriteLine("[ API:Login ] Getting current cookies...");
             uri = new Uri(URL.Login);
-            responseCookies = Cookies.GetCookies(uri);
+            responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
 
             int counter = 0;
             foreach (Cookie cookie in responseCookies)
@@ -109,7 +114,45 @@ namespace FlashLauncher
                 Debug.WriteLine("[ API:Login ] Cookie Login: " + cookie.Name + ": " + cookie.Value);
                 counter++;
             }
-            bool _ = CheckLogin(Response.Content.ReadAsStringAsync().Result);
+
+            // Login überprüfen
+            bool isLoggedIn = CheckLogin(responseData); // Nutzung der Rückgabe
+
+            //// get session Cookie
+            //Debug.WriteLine("[ API:Login ] Connecting to: " + URL.Live);
+            //Response = Client.GetAsync(URL.Live).Result;
+            //Uri uri = new Uri(URL.Live);
+            //Cookies.SetCookies(uri, $"lp-version={region.ToLower()}");
+            //IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
+            //foreach (Cookie cookie in responseCookies)
+            //{
+            //    Debug.WriteLine("[ API:Login ] set cookie: " + cookie.Name + ": " + cookie.Value);
+            //}
+
+            //Debug.WriteLine("[ API:Login ] adding Username " + UserAccount.Username + " and password to cookie");
+            //FormUrlEncodedContent content = new(new[]
+            //{
+            //    new KeyValuePair<string, string>("username", UserAccount.Username),
+            //    new KeyValuePair<string, string>("password", UserAccount.Password),
+            //});
+            //Debug.WriteLine("[ API:Login ] posting data to: " + URL.Login);
+            //HttpResponseMessage httpResponseMessage = await Client.PostAsync(URL.Login, content).Result;
+            //Response = httpResponseMessage;
+            ////string _data = Response.Content.ReadAsStringAsync().Result;
+            //string _data = await Response.Content.ReadAsStringAsync().Result;
+            //Debug.WriteLine("[ API:Login ] post result: " + _data);
+
+            //Debug.WriteLine("[ API:Login ] getting current cookies...");
+            //uri = new Uri(URL.Login);
+            //responseCookies = Cookies.GetCookies(uri);
+
+            //int counter = 0;
+            //foreach (Cookie cookie in responseCookies)
+            //{
+            //    Debug.WriteLine("[ API:Login ] Cookie Login: " + cookie.Name + ": " + cookie.Value);
+            //    counter++;
+            //}
+            //bool _ = CheckLogin(Response.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
