@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Title="FlashLauncher > EditAccount > " Height="60" Width="450">
+        Title="Flash Launcher > Edit Account > " Height="60" Width="450">
     <Grid x:Name="Grid_MainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
