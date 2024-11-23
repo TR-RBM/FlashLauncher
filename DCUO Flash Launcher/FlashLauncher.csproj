@@ -26,7 +26,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="assets\account.png" />
     <None Remove="assets\europaische-union.png" />
+    <None Remove="assets\ServerStatusFull.png" />
+    <None Remove="assets\ServerStatusLow.png" />
+    <None Remove="assets\ServerStatusMedium.png" />
     <None Remove="assets\vereinigte-staaten.png" />
     <None Remove="geckodriver.exe" />
   </ItemGroup>
@@ -55,7 +59,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="assets\account.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="assets\europaische-union.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="assets\ServerStatusFull.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="assets\ServerStatusLow.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="assets\ServerStatusMedium.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="assets\vereinigte-staaten.png">
