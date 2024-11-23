@@ -52,6 +52,13 @@ namespace FlashLauncher
         internal static string dcuoLaunchmefirstPath { get; set; }
 
         /// <summary>
+        /// Stores the DCUO server statuses.
+        /// </summary>
+        public static List<GameServerStatus> DCUOServers { get; private set; } = new();
+
+        public static List<ServerStatusViewModel> ServerStatusList { get; set; } = new();
+
+        /// <summary>
         /// Storage container for the current playsession
         /// </summary>
         internal static PlaySession PS { get; set; }
@@ -118,41 +125,6 @@ namespace FlashLauncher
             // Login überprüfen
             bool isLoggedIn = CheckLogin(responseData); // Nutzung der Rückgabe
 
-            //// get session Cookie
-            //Debug.WriteLine("[ API:Login ] Connecting to: " + URL.Live);
-            //Response = Client.GetAsync(URL.Live).Result;
-            //Uri uri = new Uri(URL.Live);
-            //Cookies.SetCookies(uri, $"lp-version={region.ToLower()}");
-            //IEnumerable<Cookie> responseCookies = Cookies.GetCookies(uri).Cast<Cookie>();
-            //foreach (Cookie cookie in responseCookies)
-            //{
-            //    Debug.WriteLine("[ API:Login ] set cookie: " + cookie.Name + ": " + cookie.Value);
-            //}
-
-            //Debug.WriteLine("[ API:Login ] adding Username " + UserAccount.Username + " and password to cookie");
-            //FormUrlEncodedContent content = new(new[]
-            //{
-            //    new KeyValuePair<string, string>("username", UserAccount.Username),
-            //    new KeyValuePair<string, string>("password", UserAccount.Password),
-            //});
-            //Debug.WriteLine("[ API:Login ] posting data to: " + URL.Login);
-            //HttpResponseMessage httpResponseMessage = await Client.PostAsync(URL.Login, content).Result;
-            //Response = httpResponseMessage;
-            ////string _data = Response.Content.ReadAsStringAsync().Result;
-            //string _data = await Response.Content.ReadAsStringAsync().Result;
-            //Debug.WriteLine("[ API:Login ] post result: " + _data);
-
-            //Debug.WriteLine("[ API:Login ] getting current cookies...");
-            //uri = new Uri(URL.Login);
-            //responseCookies = Cookies.GetCookies(uri);
-
-            //int counter = 0;
-            //foreach (Cookie cookie in responseCookies)
-            //{
-            //    Debug.WriteLine("[ API:Login ] Cookie Login: " + cookie.Name + ": " + cookie.Value);
-            //    counter++;
-            //}
-            //bool _ = CheckLogin(Response.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -239,6 +211,61 @@ namespace FlashLauncher
                 Debug.WriteLine("[ ERROR:Launch ] _LaunchArgs : " + _argName);
                 throw new ArgumentNullException(_argName);
             }
+        }
+
+        /// <summary>
+        /// Fetches and stores the server status for DCUO servers.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public static async Task FetchServerStatusAsync()
+        {
+            Debug.WriteLine("[ API2:FetchServerStatusAsync ] Fetching server status...");
+
+            string serverStatusUrl = "https://census.daybreakgames.com/s:dgc/json/get/global/game_server_status" +
+                                     "?c:show=name,game_code,region_name,last_reported_state,last_reported_time" +
+                                     "&c:limit=1000";
+
+            try
+            {
+                HttpResponseMessage response = await Client.GetAsync(serverStatusUrl);
+                response.EnsureSuccessStatusCode(); // Throw if the HTTP response indicates failure
+                string responseData = await response.Content.ReadAsStringAsync();
+
+                // Parse JSON response
+                var parsedData = JsonConvert.DeserializeObject<ServerStatusResponse>(responseData);
+                if (parsedData != null && parsedData.GameServerStatusList != null)
+                {
+                    // Filter and store DCUO server statuses
+                    var dcuoServers = parsedData.GameServerStatusList
+                        .Where(server => server.GameCode == "dcuo")
+                        .ToList();
+
+                    Debug.WriteLine("[ API2:FetchServerStatusAsync ] Fetched DCUO server statuses:");
+                    foreach (var server in dcuoServers)
+                    {
+                        Debug.WriteLine($"Server: {server.Name}, Region: {server.RegionName}, " +
+                                        $"Status: {server.LastReportedState}, Last Checked: {server.LastReportedTime}");
+                    }
+
+                    // Store server status for later use
+                    DCUOServers = dcuoServers;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ API2:FetchServerStatusAsync ] Error fetching server status: " + ex.Message);
+                throw;
+            }
+        }
+
+        public static async Task PopulateServerStatusAsync()
+        {
+            await FetchServerStatusAsync(); // Fetch server data
+            ServerStatusList = DCUOServers.Select(server => new ServerStatusViewModel
+            {
+                ServerName = server.Name,
+                ServerStatus = server.LastReportedState,
+            }).ToList();
         }
     }
 }

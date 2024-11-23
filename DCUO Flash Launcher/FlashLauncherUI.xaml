@@ -93,7 +93,9 @@
         </Grid>
         <Grid x:Name="Grid_AccountList">
             <Grid.RowDefinitions>
-                <RowDefinition Height="25"/>
+                <RowDefinition Height="19"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="5"/>
                 <RowDefinition/>
                 <RowDefinition Height="175.04"/>
             </Grid.RowDefinitions>
@@ -104,12 +106,23 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
-            <ScrollViewer Grid.Column="1" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="ListBox_AccountList" ItemsSource="{Binding}" KeyDown="ListBox_AccountList_KeyDown" MouseDoubleClick="EditAccount" Background="#0c5bb7">
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="Account Selection" FontSize="24" Foreground="White" HorizontalAlignment="Center" FontStyle="Normal" VerticalAlignment="Center" FontWeight="Bold"/>
+            <ScrollViewer Grid.Column="1" Grid.Row="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="ListBox_AccountList" ItemsSource="{Binding}" KeyDown="ListBox_AccountList_KeyDown" MouseDoubleClick="EditAccount" Background="#0c5bb7" SelectionChanged="ListBox_AccountList_SelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding Path=Username}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Foreground="White" FontSize="16" FontWeight="Bold"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Image Height="16" Width="16" Grid.Column="0" Grid.Row="0" Visibility="Visible" HorizontalAlignment="Left" VerticalAlignment="Center" Source="pack://application:,,,/FlashLauncher;component/assets/account.png"/>
+                                    <TextBlock Text="{Binding Path=Username}" Grid.Column="1" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Foreground="White" FontSize="14"/>
+                                </Grid>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -183,16 +196,45 @@
                 <RowDefinition Height="25"/>
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="5"/>
-                <RowDefinition Height="34"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
                 <RowDefinition/>
+                <RowDefinition Height="175"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="Server Region" Foreground="White" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="Server Region" Foreground="White" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
             <ComboBox x:Name="ComboBox_RegionSelection" 
-                      Grid.Row="3" Grid.Column="1" Margin="1,0,0,1" VerticalAlignment="Center" HorizontalAlignment="Center" SelectionChanged="ComboBox_RegionSelection_SelectionChanged">
+                      Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" SelectionChanged="ComboBox_RegionSelection_SelectionChanged">
                 <ComboBoxItem Content="EU"/>
                 <ComboBoxItem Content="US"/>
             </ComboBox>
             <Image x:Name="Image_ServerRegion" Grid.Column="2" Grid.Row="3" Visibility="Visible" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button x:Name="Button_RefreshServerStatus" Click="Button_RefreshServerStatus_Click" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Content="Refresh Server Status" FontSize="9" FontWeight="Bold" IsEnabled="False" ToolTip="select a character first to do a refresh"/>
+            <!-- Server Status Display -->
+            <ScrollViewer Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="7" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" FontSize="9">
+                <ListBox x:Name="ListBox_ServerStatus" Background="#0c5bb7" Foreground="White">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <!-- Server Name -->
+                                    <TextBlock Text="{Binding ServerName}" FontSize="9" FontWeight="Bold" Grid.Column="0"/>
+                                    <!-- Server Status -->
+                                    <TextBlock Text="{Binding ServerStatus}" FontSize="9" Grid.Column="1"/>
+                                </Grid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </Window>

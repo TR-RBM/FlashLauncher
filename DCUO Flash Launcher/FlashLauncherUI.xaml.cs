@@ -21,6 +21,8 @@ using System.Net;
 using System.Security.Policy;
 using Windows.Media.Protection.PlayReady;
 using System.Runtime.CompilerServices;
+using System.Configuration;
+using Serilog.Debugging;
 
 namespace FlashLauncher
 {
@@ -45,8 +47,12 @@ namespace FlashLauncher
         private RegionSettings Region { get; set; }
 
         /// <summary>
-        /// initiate the launcher
+        /// Status of Refresh Server Status Button
         /// </summary>
+        private Boolean CheckingForServerStatus { get; set; }
+
+
+
         public FlashLauncherUI()
         {
             Debug.WriteLine("[ FlashLauncherUI:Init ] Program started");
@@ -60,12 +66,13 @@ namespace FlashLauncher
             API2.IsLoggedIn = false;
             API2.LaunchArgs = "";
             API2.dcuoLaunchmefirstPath = new(@"C:\Users\Public\Daybreak Game Company\Installed Games\DC Universe Online\UNREAL3\BINARIES\WIN32\LAUNCHMEFIRST.EXE");
- 
+
             AccMgr = new AccountManager();
             Accounts = new ObservableCollection<Account>();
 
             // start the Logger
             Log.Logger = new LoggerConfiguration().WriteTo.File(@".\debug.log").CreateLogger();
+
 
             Debug.WriteLine("done");
 
@@ -74,7 +81,7 @@ namespace FlashLauncher
 
             InitializeComponent();
             DataContext = Accounts;
-            
+
             // load account list
             AccMgr.LoadFromDatabase();
             if (AccMgr.accounts.Count > 0)
@@ -83,6 +90,9 @@ namespace FlashLauncher
                 {
                     Accounts.Add(account);
                 }
+
+
+
             }
 
             // load region
@@ -121,7 +131,7 @@ namespace FlashLauncher
             {
                 Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login start");
 
-                Account account = new Account(username:TextBox_Username.Text,password:PasswordBox_Password.Password);
+                Account account = new Account(username: TextBox_Username.Text, password: PasswordBox_Password.Password);
                 API2.SetAccount(account);
                 await API2.Login(Region.CurrentSelection);
 
@@ -139,7 +149,7 @@ namespace FlashLauncher
 
                     // clear data
                     TextBox_Username.Text = "";
-                    PasswordBox_Password.Password = ""; 
+                    PasswordBox_Password.Password = "";
                 }
                 else
                 {
@@ -302,7 +312,7 @@ namespace FlashLauncher
                 }
                 else
                 {
-                    Accounts.Move(ListBox_AccountList.SelectedIndex, Accounts.Count -1);
+                    Accounts.Move(ListBox_AccountList.SelectedIndex, Accounts.Count - 1);
                     ListBox_AccountList.SelectedIndex = Accounts.Count - 1;
                 }
             }
@@ -344,7 +354,7 @@ namespace FlashLauncher
             AccMgr.accounts.Clear();
             foreach (Account acc in Accounts)
             {
-               AccMgr.accounts.Add(acc);
+                AccMgr.accounts.Add(acc);
             }
             AccMgr.SaveToDatabase();
         }
@@ -394,6 +404,54 @@ namespace FlashLauncher
                     break;
             }
             Region.WriteSettings();
+        }
+
+        private async void Button_RefreshServerStatus_Click(object sender, RoutedEventArgs e)
+        {
+            Button_RefreshServerStatus.IsEnabled = false;
+            Progressbar_Login.IsIndeterminate = true;
+            if (Accounts.Count > 0)
+            {
+                if (!(ListBox_AccountList.SelectedIndex == -1))
+                {
+                    // set the user account based on the current selected account
+                    API2.SetAccount(Accounts[ListBox_AccountList.SelectedIndex]);
+                    Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login start");
+
+                    await API2.Login(Region.CurrentSelection);
+
+                    Debug.WriteLine("[FlashLauncher:Button_Play_Click] Login done");
+                    if (!API2.IsLoggedIn)
+                    {
+                        Debug.WriteLine("[FlashLauncher:Button_Play_Click] Was unable to Login");
+                    }
+                    else
+                    {
+                        await API2.FetchServerStatusAsync();
+                        foreach (var server in API2.DCUOServers)
+                        {
+                            Console.WriteLine($"Server: {server.Name}, Status: {server.LastReportedState}");
+                        }
+
+                        await API2.PopulateServerStatusAsync();
+                        ListBox_ServerStatus.ItemsSource = API2.ServerStatusList;
+                    }
+                }
+            }
+            Button_RefreshServerStatus.IsEnabled = true;
+            Progressbar_Login.IsIndeterminate = false;
+        }
+
+        private void ListBox_AccountList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!(ListBox_AccountList.SelectedIndex == -1))
+            {
+                Button_RefreshServerStatus.IsEnabled = true;
+            }
+            else
+            {
+                Button_RefreshServerStatus.IsEnabled = false;
+            }
         }
     }
 }
