@@ -74,7 +74,7 @@ namespace FlashLauncher
         }
         public bool IsLoggedIn(Account account)
         {
-            PlaySession session = new PlaySession();
+            PlaySession? session = new PlaySession();
             if (String.IsNullOrEmpty(status))
             {
                 return false;
@@ -82,8 +82,8 @@ namespace FlashLauncher
             try
             {
                 session = JsonConvert.DeserializeObject<PlaySession>(status);
-                Debug.WriteLine(session.username + " " + session.category);
-                if (session.username == account.Username && session.category == "SUCCESS")
+                Debug.WriteLine(session.Username + " " + session.Category);
+                if (session.Username == account.Username && session.Category == "SUCCESS")
                 {
                     return true;
                 }
@@ -100,16 +100,16 @@ namespace FlashLauncher
 
         public void LaunchGame(Account account)
         {
-            PlaySession session = new PlaySession();
+            PlaySession? session = new PlaySession();
             session = JsonConvert.DeserializeObject<PlaySession>(status);
-            if (!String.IsNullOrEmpty(session.launchArgs))
+            if (!String.IsNullOrEmpty(session.LaunchArgs))
             {
                 Process dcuo = new()
                 {
                     StartInfo = new()
                     {
                         FileName = dcuoLaunchmefirstPath,
-                        Arguments = session.launchArgs,
+                        Arguments = session.LaunchArgs,
                         UseShellExecute = false,
                         CreateNoWindow = false
                     }
