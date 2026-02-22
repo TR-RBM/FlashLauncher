@@ -65,7 +65,7 @@ namespace FlashLauncher
             API2.Client = new HttpClient(API2.Handler, false);
             API2.IsLoggedIn = false;
             API2.LaunchArgs = "";
-            API2.dcuoLaunchmefirstPath = new(@"C:\Users\Public\Daybreak Game Company\Installed Games\DC Universe Online\UNREAL3\BINARIES\WIN32\LAUNCHMEFIRST.EXE");
+            API2.dcuoLaunchmefirstPath = new(@"C:\Users\Public\Daybreak Game Company\Installed Games\DC Universe Online\UNREAL3\BINARIES\WIN64\LAUNCHMEFIRST.EXE");
 
             AccMgr = new AccountManager();
             Accounts = new ObservableCollection<Account>();
@@ -279,7 +279,7 @@ namespace FlashLauncher
                     Accounts[ListBox_AccountList.SelectedIndex].Username,
                     Accounts[ListBox_AccountList.SelectedIndex].Password);
                 edit.Owner = this;
-                edit.ShowDialog();
+                bool? dia = edit.ShowDialog();
 
                 AccMgr.accounts[ListBox_AccountList.SelectedIndex].Username = edit.username;
                 AccMgr.accounts[ListBox_AccountList.SelectedIndex].Password = edit.password;
