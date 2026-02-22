@@ -1,9 +1,9 @@
 # FlashLauncher
 
-**FlashLauncher** is an unofficial, fan-made launcher for the game [DC Universe Online (DCUO)](https://www.dcuniverseonline.com/home).  
-It allows players to manage multiple user accounts and start the game more quickly than the official launcher.
-
-This project is a **proof of concept** and is **not in active development**.
+**FlashLauncher** is an unofficial, fan-made launcher for the game [DC Universe Online (DCUO)](https://www.dcuniverseonline.com/home).<br/>
+It allows players to manage multiple user accounts and start the game more quickly than the official launcher.<br/>
+This project is a **proof of concept** and is **not in active development**.<br/>
+<img width="494" height="405" alt="grafik" src="https://github.com/user-attachments/assets/582fb7bc-ea7e-44cb-9764-26d916ec87da"/>
 
 ---
 
@@ -22,10 +22,9 @@ This project is a **proof of concept** and is **not in active development**.
 ---
 
 ## Disclaimer
-**FlashLauncher** is an independent, fan-made project and is **not affiliated with, endorsed by, or approved by Daybreak Game Company LLC** or any of its partners.  
+**FlashLauncher** is an independent, fan-made project and is **not affiliated with, endorsed by, or approved by Daybreak Game Company LLC** or any of its partners.<br/>
+All rights to *DC Universe Online* (DCUO), including all names, logos, assets, and related materials, belong to their respective owners.<br/>
 
-All rights to *DC Universe Online* (DCUO), including all names, logos, assets, and related materials, belong to their respective owners.  
-
-This launcher does **not modify, distribute, or include any game files**. It simply provides a convenience interface for launching the official DCUO client.
+This launcher does **not modify, distribute, or include any game files**. It simply provides a convenience interface for launching the official DCUO client.<br/>
 
 ---
